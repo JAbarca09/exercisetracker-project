@@ -1,7 +1,11 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
 const cors = require('cors');
-require('dotenv').config();
+const dotenv = require('dotenv');
+
+dotenv.config({ path: './sample.env' });
+// require('dotenv').config();
 
 app.use(cors());
 app.use(express.static('public'));
