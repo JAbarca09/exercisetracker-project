@@ -13,14 +13,18 @@ exports.getAllUsers = async (req, res) => {
 exports.createUser = async (req, res) => {
   const username = req.body.username;
   try {
-    // const existingUser = User.findOne({ username });
-    // if (existingUser) {
-    //   return res.status(409).json({ message: 'Username already registerd' });
-    // }
+    const existingUser = User.findOne({ username });
+    if (existingUser) {
+      return res.status(409).json({ message: 'Username already registerd' });
+    }
 
-    const user = new User({ username: username });
+    const user = new User({ username });
     await user.save();
-    return res.status(201).json({ user });
+
+    return res.status(201).json({
+      username: user.username,
+      _id: user._id,
+    });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: 'Internal server error' });
