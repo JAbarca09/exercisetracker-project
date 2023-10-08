@@ -3,9 +3,16 @@ const User = require('../models/userModel');
 exports.getAllUsers = async (req, res) => {
   try {
     const allUsers = await User.find();
-    res.status(200).json({ allUsers });
+
+    const usersArray = allUsers.map((user) => ({
+      _id: user._id,
+      username: user.username,
+      __v: user.__v,
+    }));
+
+    res.status(200).json(usersArray);
   } catch (err) {
-    console.error('Could not get all users:', err);
+    console.log(err.message);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
