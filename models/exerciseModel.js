@@ -16,11 +16,6 @@ const exerciseSchema = new mongoose.Schema({
   date: {
     type: String,
     required: true,
-  },
-  _id:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
-    required: true
   }
 });
 
