@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
 const userRoutes = require('./routes/userRoutes');
 
 dotenv.config({ path: './sample.env' });
@@ -12,6 +13,7 @@ dotenv.config({ path: './sample.env' });
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(morgan('dev'));
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
