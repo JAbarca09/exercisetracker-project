@@ -3,11 +3,12 @@ const Exercise = require('../models/exerciseModel');
 // Response
 // {"_id":"652382314c3ec20832c9fd1e","username":"Rekby","date":"Tue Aug 03 2021","duration":10,"description":"Heyo"}
 
-//FIXME date should be translated from YYYY-MM-DD 2020-03-09 to EX: Tue Aug 03 2021
 exports.createExercise = async (req, res) => {
   try {
     const userId = req.body[':_id'];
     const { description, duration, date } = req.body;
+    const DATE = new Date(date);
+    const formattedDate = DATE.toDateString();
     const existingUser = await User.findById(userId);
 
     // TODO Validate user id
@@ -19,7 +20,7 @@ exports.createExercise = async (req, res) => {
       userId,
       description,
       duration,
-      date,
+      date: formattedDate,
     });
 
     await newExercise.save();
@@ -28,7 +29,7 @@ exports.createExercise = async (req, res) => {
       userId,
       description,
       duration,
-      date,
+      date: formattedDate,
     });
   } catch (err) {
     console.log(err);
