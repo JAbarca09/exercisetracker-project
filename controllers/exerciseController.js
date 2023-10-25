@@ -2,7 +2,6 @@ const User = require('../models/userModel');
 const Exercise = require('../models/exerciseModel');
 // Response
 // {"_id":"652382314c3ec20832c9fd1e","username":"Rekby","date":"Tue Aug 03 2021","duration":10,"description":"Heyo"}
-
 exports.createExercise = async (req, res) => {
   try {
     const userId = req.body[':_id'];
@@ -17,19 +16,21 @@ exports.createExercise = async (req, res) => {
     }
 
     const newExercise = new Exercise({
-      userId,
+      username: existingUser.username,
       description,
       duration,
       date: formattedDate,
     });
 
     await newExercise.save();
+    const newExerciseId = newExercise._id;
 
     return res.status(201).json({
-      userId,
-      description,
-      duration,
+      _id: newExerciseId,
+      username: existingUser.username,
       date: formattedDate,
+      duration,
+      description,
     });
   } catch (err) {
     console.log(err);
