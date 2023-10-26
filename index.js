@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const userRoutes = require('./routes/userRoutes');
 const exerciseRoutes = require('./routes/exerciseRoutes');
+const logRoutes = require('./routes/logRoutes');
 
 dotenv.config({ path: './sample.env' });
 // require('dotenv').config();
@@ -30,6 +31,7 @@ mongoose
 
 app.use('/api', userRoutes);
 app.use('/api', exerciseRoutes);
+app.use('/api', logRoutes);
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
