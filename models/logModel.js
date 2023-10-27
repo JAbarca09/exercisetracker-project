@@ -16,17 +16,17 @@ const logEntrySchema = new mongoose.Schema({
 });
 
 const logSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  },
   username: {
     type: String,
     required: true,
   },
   count: {
     type: Number,
-    required: true,
-  },
-  _id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
     required: true,
   },
   log: [logEntrySchema],
