@@ -6,15 +6,15 @@ exports.getUserLogs = async (req, res) => {
   const userId = req.params['_id'];
 
   const existingUser = await User.findById(userId);
-  console.log(existingUser);
 
   if (!existingUser) {
     return res.status(404).json({ message: 'User not found' });
   }
-  // Found a user now check if they have a log
+
   const existingLog = await Log.findOne({ username: existingUser.username });
+
   if (!existingLog) {
-    // TODO create a log
+    // If no log exists, create a new log
     const exercises = await Exercise.find({ username: existingUser.username });
     const exercise = exercises.map((element) => {
       return {
@@ -23,8 +23,7 @@ exports.getUserLogs = async (req, res) => {
         date: element.date,
       };
     });
-    console.log(exercise);
-    // Create one if needed
+
     const log = new Log({
       _id: userId,
       username: existingUser.username,
@@ -34,9 +33,26 @@ exports.getUserLogs = async (req, res) => {
 
     await log.save();
     return res.status(200).json(log);
-  }
-  // TODO check if the log needs to be updated
-  // TODO Update the log
+  } else {
+    const exercises = await Exercise.find({ username: existingUser.username });
+    const exerciseCount = exercises.length;
 
-  return res.status(200).json({ message: 'Hello World' });
+    if (exerciseCount !== existingLog.count) {
+      const updatedExerciseLog = exercises.map((element) => {
+        return {
+          description: element.description,
+          duration: element.duration,
+          date: element.date,
+        };
+      });
+
+      existingLog.count = exerciseCount;
+      existingLog.log = updatedExerciseLog;
+
+      await existingLog.save();
+      return res.status(200).json(existingLog);
+    }
+
+    return res.status(200).json(existingLog);
+  }
 };
