@@ -2,17 +2,28 @@ const User = require('../models/userModel');
 const Exercise = require('../models/exerciseModel');
 // Response
 // {"_id":"652382314c3ec20832c9fd1e","username":"Rekby","date":"Tue Aug 03 2021","duration":10,"description":"Heyo"}
+
+const isValidDate = (date) => {
+  return !isNaN(new Date(date));
+};
+
 exports.createExercise = async (req, res) => {
   try {
     const userId = req.body[':_id'];
     const { description, duration, date } = req.body;
-    const DATE = new Date(date);
-    const formattedDate = DATE.toDateString();
     const existingUser = await User.findById(userId);
 
-    // TODO Validate user id
     if (!existingUser) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    let formattedDate;
+
+    if (isValidDate(date)) {
+      formattedDate = new Date(date).toDateString();
+    } else {
+      const today = new Date();
+      formattedDate = today.toDateString();
     }
 
     const newExercise = new Exercise({
