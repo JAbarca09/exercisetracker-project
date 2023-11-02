@@ -20,7 +20,7 @@ exports.getAllUsers = async (req, res) => {
 exports.createUser = async (req, res) => {
   const username = req.body.username;
   try {
-    const existingUser = User.findOne({ username });
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(409).json({ message: 'Username already registerd' });
     }
