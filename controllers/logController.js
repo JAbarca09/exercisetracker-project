@@ -2,9 +2,9 @@ const User = require('../models/userModel');
 const Exercise = require('../models/exerciseModel');
 const Log = require('../models/logModel');
 
-// Example query 
+// Example query
 // http://localhost:3000/api/users/6520e2304efe5e4f2ac92687/logs?from=2020-01-01&to=2021-01-01&limit=1
-// FIXME save dates as date objects to the db but responses are toDateString() instead!
+
 exports.getUserLogs = async (req, res) => {
   const userId = req.params['_id'];
   const from = req.query.from;
@@ -18,7 +18,8 @@ exports.getUserLogs = async (req, res) => {
   }
 
   const existingLog = await Log.findOne({ username: existingUser.username });
-
+  let responseLog; // The whole log
+  let responseLogs; // log that makes up the key "log"
   if (!existingLog) {
     // If no log exists, create a new log
     let exercisesQuery = { username: existingUser.username };
@@ -53,7 +54,24 @@ exports.getUserLogs = async (req, res) => {
     });
 
     await log.save();
-    return res.status(200).json(log);
+
+    responseLogs = exercise.map((element) => {
+      return {
+        description: element.description,
+        duration: element.duration,
+        date: element.date.toDateString(),
+      };
+    });
+
+    responseLog = {
+      _id: userId,
+      username: existingUser.username,
+      count: exercise.length,
+      log: responseLogs,
+    };
+    responseLog.log = responseLogs;
+
+    return res.status(200).json(responseLog);
   } else {
     let exercisesQuery = { username: existingUser.username };
 
@@ -74,6 +92,7 @@ exports.getUserLogs = async (req, res) => {
     const exerciseCount = exercises.length;
 
     if (exerciseCount !== existingLog.count) {
+      // Another task was created
       const updatedExerciseLog = exercises.map((element) => {
         return {
           description: element.description,
@@ -86,9 +105,42 @@ exports.getUserLogs = async (req, res) => {
       existingLog.log = updatedExerciseLog;
 
       await existingLog.save();
-      return res.status(200).json(existingLog);
-    }
 
-    return res.status(200).json(existingLog);
+      responseLogs = existingLog.log.map((element) => {
+        return {
+          description: element.description,
+          duration: element.duration,
+          date: element.date.toDateString(),
+        };
+      });
+
+      responseLog = {
+        _id: userId,
+        username: existingUser.username,
+        count: exerciseCount,
+        log: responseLogs,
+      };
+      responseLog.log = responseLogs;
+
+      return res.status(200).json(responseLog);
+    }
+    // nothing has changed retrieve log
+    responseLogs = existingLog.log.map((element) => {
+      return {
+        description: element.description,
+        duration: element.duration,
+        date: element.date.toDateString(),
+      };
+    });
+
+    responseLog = {
+      _id: userId,
+      username: existingUser.username,
+      count: existingLog.count,
+      log: responseLogs,
+    };
+    responseLog.log = responseLogs;
+
+    return res.status(200).json(responseLog);
   }
 };
